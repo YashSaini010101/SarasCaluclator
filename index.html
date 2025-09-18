@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Saras Calculator App</title>
     <style>
-        /* ✅ Your Original Design (UNCHANGED) */
         body {
             margin: 0;
             font-family: Arial, sans-serif;
@@ -85,7 +84,6 @@
             <label><input type="radio" name="format" value="liter"> Liter</label>
         </div>
 
-        <!-- ✅ Product Items -->
         <div id="items">
             <div class="item"><img src="Tond.png"><span>Tond Milk</span> <input type="number" data-product="Tond" placeholder="0" value="0" min="0"></div>
             <div class="item"><img src="Gold.png"><span>Gold Milk</span> <input type="number" data-product="Gold" placeholder="0" value="0" min="0"></div>
@@ -100,11 +98,10 @@
 			<div class="item"><img src="massala_chach.png"><span>Massala Chach</span> <input type="number" data-product="MassalaChach" placeholder="0" value="0" min="0"></div>
 			<div class="item"><img src="Kanha.png"> <span>Toast 10 ₹</span> <input type="number" data-product="Toast10" placeholder="0" value="0" min="0"></div>
 			<div class="item"><img src="Namkeen.png"><span>Namkeen</span> <input type="number" data-product="Namkeen" placeholder="0" value="0" min="0"></div>
-            <!-- ✅ NEW: Old Dues (treated as a money amount, not quantity) -->
+            
             <div class="item"><img src="money.png"><span>Old Dues</span> <input type="number" data-product="OldDues" placeholder="0" value="0" min="0"></div>
         </div>
 
-        <!-- Toggle for extra items -->
         <div class="toggle-section">
             <span>Additional Items</span>
             <input type="checkbox" id="toggleItems" onchange="toggleExtraItems()">
@@ -144,7 +141,6 @@
             extra.style.display = (extra.style.display === "none" || extra.style.display === "") ? "block" : "none";
         }
 
-        // helper: sanitize numeric inputs and keep 0-default behavior UX
         function setupInputBehavior() {
             document.querySelectorAll('#items input, #extraItems input').forEach(input => {
                 input.addEventListener('focus', () => { if (input.value === "0") input.value = ""; });
@@ -160,12 +156,10 @@ function generateBill() {
   const rate = parseFloat(document.querySelector('input[name="rate"]:checked').value);
   const format = document.querySelector('input[name="format"]:checked').value;
 
-  // ✅ Select ALL product inputs (including additional items)
   const inputs = document.querySelectorAll('[data-product]');
   const items = [];
   let grandTotal = 0;
 
-  // ✅ Define all additional item prices manually
   const productPrices = {
     "MassalaChach": 6.5, "Batcha": 9, "Dhai16": 15.5, "Dhai10": 9, "Dhai10Dabba": 9.5, 
 	"Dhai20Dabba": 18, "Dhai30": 31, "Bread": 12, "Paneer77": 75, "Bread25": 25, "Toast10": 9,
@@ -179,23 +173,22 @@ function generateBill() {
       let price = 0;
       
       if (["Tond", "Gold", "Chach"].includes(input.dataset.product)) {
-  // ✅ Milk product rates (manual .67 / .75 calculation)
+
   let basePrice =
     input.dataset.product === "Tond"
       ? (rate === 0.67 ? 26.67 : 26.75)
       : input.dataset.product === "Gold"
       ? (rate === 0.67 ? 33.67 : 33.75)
-      : (rate === 0.67 ? 15.75 : 15.75); // ✅ Chach pouch price
+      : (rate === 0.67 ? 15.75 : 15.75);
 
-  // ✅ Apply format (pouch/liter)
   if (format === "liter") {
-    basePrice *= 2; // Convert pouch price to liter price
+    basePrice *= 2;
   }
 
   price = qty * basePrice;
 } 
 else if (input.dataset.product === "OldDues") {
-  price = qty; // ✅ Take old dues as is
+  price = qty;
 } 
 else if (productPrices[input.dataset.product]) {
   price = productPrices[input.dataset.product] * qty;
@@ -203,8 +196,6 @@ else if (productPrices[input.dataset.product]) {
 
 grandTotal += price;
 
-
-      // ✅ Get correct image (if exists)
       const imgSrc = input.closest(".item")?.querySelector("img")?.src || "";
 
       items.push({
@@ -216,13 +207,10 @@ grandTotal += price;
     }
   });
 
-  // ✅ Finalize Grand Total
   grandTotal = parseFloat(grandTotal.toFixed(2));
 
-  // Save items for bill page
   localStorage.setItem("sarasBill", JSON.stringify(items));
 
-  // ✅ Save full record to history
   const history = JSON.parse(localStorage.getItem('sarasHistory')) || [];
   const now = new Date();
   history.push({
@@ -236,7 +224,6 @@ grandTotal += price;
   });
   localStorage.setItem('sarasHistory', JSON.stringify(history));
 
-  // Redirect to bill page
   window.location.href = "bill.html";
 }
 </script>
