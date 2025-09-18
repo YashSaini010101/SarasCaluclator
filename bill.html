@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Saras Calculator App - Bill</title>
   <style>
-    /* ✅ SAME DESIGN AS saras_calculator.html */
     body {
       margin: 0;
       font-family: Arial, sans-serif;
@@ -125,8 +124,7 @@
 
       const tbody = document.getElementById('billBody');
       tbody.innerHTML = '';
-
-      // Separate Old Dues
+      
       let oldDuesItem=null; const nonDues=[];
       items.forEach(it=> it.name.toLowerCase().includes('due') ? oldDuesItem=it : nonDues.push(it));
 
@@ -177,7 +175,6 @@
       const btn=document.getElementById('payBtn');
       btn.disabled=true; btn.textContent='Paid';
 
-      // update history latest entry
       const hist=JSON.parse(localStorage.getItem('sarasHistory'))||[];
       if(hist.length>0){
         hist[hist.length-1].paid=paid;
@@ -190,4 +187,5 @@
   </script>
 </body>
 </html>
+
 
