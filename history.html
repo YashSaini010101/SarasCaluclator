@@ -153,7 +153,6 @@
 
     function viewBill(historyArr, index) {
       if (historyArr[index]) {
-        // ✅ Make sure to store items WITH images
         localStorage.setItem('sarasBill', JSON.stringify(historyArr[index].items));
         window.location.href = 'bill.html';
       }
@@ -163,4 +162,5 @@
   </script>
 </body>
 </html>
+
 
