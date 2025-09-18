@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>History - Saras Calculator App</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, #6a11cb, #2575fc);
+      color: white;
+      overflow-x: hidden;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      background: #6200ea;
+      padding: 10px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      z-index: 1000;
+      position: relative;
+    }
+    .menu-btn {
+      font-size: 1.5rem;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+    .drawer {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 250px;
+      max-width: 70%;
+      height: 100%;
+      background: linear-gradient(to bottom, #6a11cb, #2575fc);
+      color: white;
+      transform: translateX(-100%);
+      transition: transform 0.35s ease-in-out;
+      padding: 20px;
+      z-index: 3000;
+      box-shadow: 4px 0 10px rgba(0,0,0,0.5);
+    }
+    .drawer.open { transform: translateX(0); }
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 2500;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .overlay.show { display: block; opacity: 1; }
+    .drawer h2 {
+      margin: 0 0 20px 0;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+    .drawer a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px;
+      text-decoration: none;
+      color: white;
+      font-size: 1rem;
+      transition: background 0.2s ease;
+      border-radius: 8px;
+    }
+    .drawer a:hover { background: rgba(255, 255, 255, 0.2); }
+
+    .container { padding: 10px; max-width: 600px; margin: auto; }
+    .history-card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .history-card:hover { background: rgba(255, 255, 255, 0.2); }
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      opacity: 0.9;
+      margin-bottom: 5px;
+    }
+    .history-total { text-align: right; font-weight: bold; margin-top: 5px; }
+    .history-extra { font-size: 0.85rem; opacity: 0.8; }
+  </style>
+</head>
+<body>
+  <header>
+    <span class="menu-btn" onclick="toggleDrawer()">☰</span>
+    Saras Calculator App
+  </header>
+
+  <div class="overlay" id="overlay" onclick="closeDrawer()"></div>
+
+  <div class="drawer" id="drawer">
+    <h2>Saras Calculator App</h2>
+    <a href="saras_calculator.html"><span>🏠</span><span>Home</span></a>
+    <a href="history.html"><span>⏳</span><span>History</span></a>
+    <a href="about.html"><span>ℹ</span><span>About Us</span></a>
+  </div>
+
+  <div class="container" id="historyContainer"></div>
+
+  <script>
+    function toggleDrawer(){
+      document.getElementById("drawer").classList.toggle("open");
+      document.getElementById("overlay").classList.toggle("show");
+    }
+    function closeDrawer(){
+      document.getElementById("drawer").classList.remove("open");
+      document.getElementById("overlay").classList.remove("show");
+    }
+
+    function loadHistory() {
+      let history = JSON.parse(localStorage.getItem('sarasHistory')) || [];
+      const container = document.getElementById('historyContainer');
+      container.innerHTML = "";
+
+      if (history.length === 0) {
+        container.innerHTML = "<p>No history available.</p>";
+        return;
+      }
+
+      history = history.reverse(); // show latest bill first
+
+      history.forEach((bill, index) => {
+        const card = document.createElement('div');
+        card.classList.add('history-card');
+        card.innerHTML = `
+          <div class="history-header">
+            <span>${bill.date || ""}</span>
+            <span>${bill.time || ""}</span>
+          </div>
+          <div>Rate: ${bill.rate ?? "-"} | Format: ${bill.format ?? "-"}</div>
+          <div class="history-total">Total: ₹ ${(bill.total ?? 0).toFixed ? bill.total.toFixed(2) : bill.total}</div>
+          ${bill.paid !== undefined ? `<div class="history-extra">Paid: ₹ ${(bill.paid ?? 0).toFixed(2)} | Due: ₹ ${(bill.due ?? 0).toFixed(2)}</div>` : ""}
+        `;
+        card.onclick = () => viewBill(history, index);
+        container.appendChild(card);
+      });
+    }
+
+    function viewBill(historyArr, index) {
+      if (historyArr[index]) {
+        // ✅ Make sure to store items WITH images
+        localStorage.setItem('sarasBill', JSON.stringify(historyArr[index].items));
+        window.location.href = 'bill.html';
+      }
+    }
+
+    window.onload = loadHistory;
+  </script>
+</body>
+</html>

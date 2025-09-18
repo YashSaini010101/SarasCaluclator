@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Saras Calculator App - Bill</title>
+  <style>
+    /* ✅ SAME DESIGN AS saras_calculator.html */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, #6a11cb, #2575fc);
+      color: white;
+      overflow-x: hidden;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      background: #6200ea;
+      padding: 10px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      z-index: 1000;
+      position: relative;
+    }
+    .menu-btn { font-size: 1.5rem; margin-right: 10px; cursor: pointer; background: none; border: none; color: inherit; }
+    .drawer {
+      position: fixed;
+      left: 0; top: 0;
+      width: 250px; max-width: 70%;
+      height: 100%;
+      background: linear-gradient(to bottom, #6a11cb, #2575fc);
+      color: white;
+      transform: translateX(-100%);
+      transition: transform 0.35s ease-in-out;
+      padding: 20px;
+      z-index: 3000;
+      box-shadow: 4px 0 10px rgba(0,0,0,0.5);
+    }
+    .drawer.open { transform: translateX(0); }
+    .overlay {
+      display: none;
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 2500; opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .overlay.show { display: block; opacity: 1; }
+    .drawer h2 { margin: 0 0 20px 0; font-size: 1.2rem; font-weight: bold; }
+    .drawer a { display: flex; align-items: center; gap: 8px; padding: 10px; text-decoration: none; color: white; font-size: 1rem; border-radius: 8px; }
+    .drawer a:hover { background: rgba(255,255,255,0.2); }
+
+    .container { padding: 10px; max-width: 600px; margin: auto; }
+    table { width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.08); border-radius: 10px; overflow: hidden; margin-top: 10px; }
+    th, td { padding: 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    th { background: rgba(255,255,255,0.15); font-weight: bold; }
+    td img { width: 40px; height: 40px; object-fit: contain; display: block; margin: 0 auto 5px; }
+    .highlight { background: rgba(0,0,0,0.2); font-weight: bold; }
+    .due-row { background: rgba(255,0,0,0.2); font-weight: bold; }
+    input[type="number"] {
+      width: 90%; padding: 6px;
+      border-radius: 6px; border: none;
+      text-align: center;
+    }
+    button.pay {
+      background: #6200ea;
+      color: white;
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button.pay:disabled { background: rgba(98,0,234,0.5); cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <header>
+    <button class="menu-btn" onclick="toggleDrawer()">☰</button>
+    Saras Calculator App
+  </header>
+
+  <div class="overlay" id="overlay" onclick="closeDrawer()"></div>
+  <div class="drawer" id="drawer">
+    <h2>Saras Calculator App</h2>
+    <a href="saras_calculator.html"><span>🏠</span><span>Home</span></a>
+    <a href="history.html"><span>⏳</span><span>History</span></a>
+    <a href="about.html"><span>ℹ</span><span>About Us</span></a>
+  </div>
+
+  <div class="container">
+    <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+      <div id="billDate"></div>
+      <div id="billTime"></div>
+    </div>
+
+    <table>
+      <thead><tr><th>Product</th><th>Quantity</th><th>Amount (₹)</th></tr></thead>
+      <tbody id="billBody"></tbody>
+    </table>
+  </div>
+
+  <script>
+    function toggleDrawer(){document.getElementById("drawer").classList.toggle("open");document.getElementById("overlay").classList.toggle("show");}
+    function closeDrawer(){document.getElementById("drawer").classList.remove("open");document.getElementById("overlay").classList.remove("show");}
+
+    function toNumber(v){if(v==null)return 0;if(typeof v==="number")return v;const s=String(v).replace(/[^\d.-]+/g,'');const n=parseFloat(s);return Number.isFinite(n)?n:0;}
+    function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+    function formatNumber(n){return Number(n||0).toFixed(2);}
+
+    function normalizeItems(raw){
+      if(!Array.isArray(raw))return[];
+      return raw.map(it=>{
+        const name=it.name||it.product||''; const image=it.image||''; 
+        const qtyRaw=it.qty??it.quantity??it.qtyDisplay??''; 
+        const amount=toNumber(it.price??it.amount??0);
+        return {name, image, qtyDisplay:qtyRaw, amount};
+      });
+    }
+
+    function renderBill(){
+      const raw = JSON.parse(localStorage.getItem('sarasBill')) || [];
+      const items = normalizeItems(raw);
+
+      const tbody = document.getElementById('billBody');
+      tbody.innerHTML = '';
+
+      // Separate Old Dues
+      let oldDuesItem=null; const nonDues=[];
+      items.forEach(it=> it.name.toLowerCase().includes('due') ? oldDuesItem=it : nonDues.push(it));
+
+      nonDues.forEach(it=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML=`<td><img src="${escapeHtml(it.image)}"><div>${escapeHtml(it.name)}</div></td><td>${escapeHtml(it.qtyDisplay)}</td><td>${formatNumber(it.amount)}</td>`;
+        tbody.appendChild(tr);
+      });
+
+      if(oldDuesItem){
+        const tr=document.createElement('tr');
+        tr.innerHTML=`<td><img src="${escapeHtml(oldDuesItem.image)}"><div>${escapeHtml(oldDuesItem.name)}</div></td><td>${escapeHtml(oldDuesItem.qtyDisplay)}</td><td>${formatNumber(oldDuesItem.amount)}</td>`;
+        tbody.appendChild(tr);
+      }
+
+      const total = items.reduce((sum,i)=>sum+toNumber(i.amount),0);
+      window.__originalGrandTotal=total;
+
+      const totalRow=document.createElement('tr');
+      totalRow.className='highlight';
+      totalRow.innerHTML=`<td colspan="2">Grand Total</td><td id="grandTotalCell">${formatNumber(total)}</td>`;
+      tbody.appendChild(totalRow);
+
+      const payRow=document.createElement('tr');
+      payRow.innerHTML=`<td colspan="2"><input type="number" id="paidInput" placeholder="Enter Paid Amount (₹)"></td><td><button class="pay" id="payBtn">Pay</button></td>`;
+      tbody.appendChild(payRow);
+
+      const dueRow=document.createElement('tr');
+      dueRow.id='dueRow';
+      dueRow.className='due-row';
+      dueRow.style.display='none';
+      dueRow.innerHTML=`<td colspan="2">Due Amount</td><td id="dueCell">0.00</td>`;
+      tbody.appendChild(dueRow);
+
+      document.getElementById('billDate').textContent=new Date().toLocaleDateString();
+      document.getElementById('billTime').textContent=new Date().toLocaleTimeString();
+
+      document.getElementById('payBtn').addEventListener('click',onPayClick);
+    }
+
+    function onPayClick(){
+      const paid=toNumber(document.getElementById('paidInput').value);
+      const grand=toNumber(window.__originalGrandTotal);
+      const due=Math.max(0,grand-paid);
+      document.getElementById('dueRow').style.display='table-row';
+      document.getElementById('dueCell').textContent=formatNumber(due);
+      document.getElementById('paidInput').value=formatNumber(paid);
+      const btn=document.getElementById('payBtn');
+      btn.disabled=true; btn.textContent='Paid';
+
+      // update history latest entry
+      const hist=JSON.parse(localStorage.getItem('sarasHistory'))||[];
+      if(hist.length>0){
+        hist[hist.length-1].paid=paid;
+        hist[hist.length-1].due=due;
+        localStorage.setItem('sarasHistory',JSON.stringify(hist));
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded',renderBill);
+  </script>
+</body>
+</html>

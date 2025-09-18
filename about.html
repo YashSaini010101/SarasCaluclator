@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us - Saras Calculator App</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, #6a11cb, #2575fc);
+      color: white;
+      overflow-x: hidden;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      background: #6200ea;
+      padding: 10px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      z-index: 1000;
+      position: relative;
+    }
+    .menu-btn { font-size: 1.5rem; margin-right: 10px; cursor: pointer; }
+    .drawer {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 250px;
+      max-width: 70%;
+      height: 100%;
+      background: linear-gradient(to bottom, #6a11cb, #2575fc);
+      color: white;
+      transform: translateX(-100%);
+      transition: transform 0.35s ease-in-out;
+      padding: 20px;
+      z-index: 3000;
+      box-shadow: 4px 0 10px rgba(0,0,0,0.5);
+    }
+    .drawer.open { transform: translateX(0); }
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 2500;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .overlay.show { display: block; opacity: 1; }
+    .drawer h2 {
+      background: transparent;
+      color: white;
+      margin: 0 0 20px 0;
+      padding: 10px 0;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+    .drawer a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px;
+      text-decoration: none;
+      color: white;
+      font-size: 1rem;
+      transition: background 0.2s ease;
+      border-radius: 8px;
+    }
+    .drawer a:hover { background: rgba(255, 255, 255, 0.2); }
+
+    /* ✅ About Section */
+    .container {
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+      text-align: center;
+    }
+    .profile-img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid white;
+      margin-top: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    }
+    .name {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin: 15px 0 5px;
+    }
+    .subtitle {
+      font-size: 1rem;
+      opacity: 0.85;
+    }
+    .about-text {
+      margin-top: 20px;
+      background: rgba(255,255,255,0.1);
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 1rem;
+      line-height: 1.5;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <span class="menu-btn" onclick="toggleDrawer()">☰</span>
+    Saras Calculator App
+  </header>
+
+  <div class="overlay" id="overlay" onclick="closeDrawer()"></div>
+
+  <div class="drawer" id="drawer">
+    <h2>Saras Calculator App</h2>
+    <a href="saras_calculator.html"><span>🏠</span><span>Home</span></a>
+    <a href="history.html"><span>⏳</span><span>History</span></a>
+    <a href="about.html"><span>ℹ</span><span>About Us</span></a>
+  </div>
+
+  <div class="container">
+    <!-- ✅ Replace profile.png with your actual DP -->
+    <img src="profile.jpg" alt="DP" class="profile-img">
+
+    <div class="name">Yash Kumar Saini</div>
+    <div class="subtitle">Student ID: 0148 | Web Developer</div>
+
+    <div class="about-text">
+      Hi! I'm a passionate web developer and a student currently pursuing my studies.
+      I love building modern, user-friendly web applications and learning about new
+      technologies every day. This Saras Calculator App is one of my projects to
+      make billing simple and fast.
+    </div>
+  </div>
+
+  <script>
+    function toggleDrawer() {
+      document.getElementById("drawer").classList.toggle("open");
+      document.getElementById("overlay").classList.toggle("show");
+    }
+    function closeDrawer() {
+      document.getElementById("drawer").classList.remove("open");
+      document.getElementById("overlay").classList.remove("show");
+    }
+  </script>
+</body>
+</html>
